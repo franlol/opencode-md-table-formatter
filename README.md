@@ -13,13 +13,7 @@ Markdown table formatter plugin for OpenCode with concealment mode support.
 - ✅ **Silent operation** - No console logs, errors don't interrupt workflow
 - ✅ **Validation feedback** - Invalid tables get helpful error comments
 
-## Installation
-
-```bash
-bun add @franlol/opencode-mdtf
-```
-
-## Quick Start
+## Usage
 
 Add the plugin to your `.opencode/opencode.jsonc`:
 
