@@ -48,11 +48,11 @@ The plugin handles complex edge cases with concealment mode enabled:
 **Output** (automatically formatted):
 
 ```
-| Feature     | Description            | Status      |
-| ----------- | ---------------------- | ----------- |
-| **Bold text** | Has *italic* content     | ✅ Done     |
-| `Code`        | With `**bold**` inside     | ⏳ Progress |
-| Unicode     | Greek α β γ            | 💡 Idea     |
+| Feature       | Description            | Status      |
+| ------------- | ---------------------- | ----------- |
+| **Bold text** | Has *italic* content   | ✅ Done     |
+| `Code`        | With `**bold**` inside | ⏳ Progress |
+| Unicode       | Greek α β γ            | 💡 Idea     |
 ```
 
 **Key behaviors:**
