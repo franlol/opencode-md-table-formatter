@@ -184,6 +184,8 @@ function getStringWidth(text: string): number {
       .replace(/\*\*(.+?)\*\*/g, "$1") // **bold** -> bold
       .replace(/\*(.+?)\*/g, "$1") // *italic* -> italic
       .replace(/~~(.+?)~~/g, "$1") // ~~strike~~ -> strike
+      .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, "$1") // ![alt](url) -> alt (OpenTUI shows only alt text)
+      .replace(/\[([^\]]+)\]\(([^)]+)\)/g, "$1 ($2)") // [text](url) -> text (url)
   }
 
   // Step 3: Restore code content (with its original markdown preserved)
