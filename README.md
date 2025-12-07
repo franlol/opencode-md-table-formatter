@@ -1,4 +1,4 @@
-# @franlol/opencode-mdtf
+# @franlol/opencode-md-table-formatter
 
 Markdown table formatter plugin for OpenCode with concealment mode support.
 
