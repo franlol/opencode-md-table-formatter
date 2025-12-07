@@ -19,7 +19,7 @@ Add the plugin to your `.opencode/opencode.jsonc`:
 
 ```jsonc
 {
-  "plugin": ["@franlol/opencode-mdtf"],
+  "plugin": ["@franlol/opencode-md-table-formatter"],
 }
 ```
 
