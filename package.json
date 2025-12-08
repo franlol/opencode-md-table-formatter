@@ -1,6 +1,6 @@
 {
   "name": "@franlol/opencode-md-table-formatter",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Markdown table formatter plugin for OpenCode with concealment mode support",
   "keywords": [
     "opencode",
