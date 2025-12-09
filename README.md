@@ -2,17 +2,6 @@
 
 Markdown table formatter plugin for Opencode with concealment mode support.
 
-## Features
-
-- ✅ **Automatic table formatting** - Formats markdown tables after AI text completion
-- ✅ **Concealment mode compatible** - Correctly calculates column widths when markdown symbols are hidden
-- ✅ **Alignment support** - Left (`:---`), center (`:---:`), and right (`---:`) text alignment
-- ✅ **Nested markdown handling** - Strips bold, italic, strikethrough with multi-pass algorithm
-- ✅ **Code block preservation** - Preserves markdown symbols inside inline code (`` `**bold**` ``)
-- ✅ **Edge case handling** - Emojis, unicode characters, empty cells, long content
-- ✅ **Silent operation** - No console logs, errors don't interrupt workflow
-- ✅ **Validation feedback** - Invalid tables get helpful error comments
-
 ## Usage
 
 Add the plugin to your `.opencode/opencode.jsonc`:
@@ -22,6 +11,17 @@ Add the plugin to your `.opencode/opencode.jsonc`:
   "plugin": ["@franlol/opencode-md-table-formatter@0.0.3"],
 }
 ```
+
+## Features
+
+- **Automatic table formatting** - Formats markdown tables after AI text completion
+- **Concealment mode compatible** - Correctly calculates column widths when markdown symbols are hidden
+- **Alignment support** - Left (`:---`), center (`:---:`), and right (`---:`) text alignment
+- **Nested markdown handling** - Strips bold, italic, strikethrough with multi-pass algorithm
+- **Code block preservation** - Preserves markdown symbols inside inline code (`` `**bold**` ``)
+- **Edge case handling** - Emojis, unicode characters, empty cells, long content
+- **Silent operation** - No console logs, errors don't interrupt workflow
+- **Validation feedback** - Invalid tables get helpful error comments
 
 Restart Opencode. Tables in AI responses will now be automatically formatted!
 
