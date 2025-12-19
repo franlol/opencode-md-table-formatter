@@ -15,8 +15,7 @@ export const FormatTables: Plugin = async () => {
       try {
         output.text = formatMarkdownTables(output.text)
       } catch (error) {
-        // If formatting fails, keep original md text
-        output.text = output.text + "\n\n<!-- table formatting failed: " + (error as Error).message + " -->"
+        // Silent failure - keep original text without error comments
       }
     },
   } as Hooks
@@ -42,8 +41,8 @@ function formatMarkdownTables(text: string): string {
       if (isValidTable(tableLines)) {
         result.push(...formatTable(tableLines))
       } else {
+        // Silent failure - keep original table without error comments
         result.push(...tableLines)
-        result.push("<!-- table not formatted: invalid structure -->")
       }
     } else {
       result.push(line)
