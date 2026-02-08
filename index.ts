@@ -2,6 +2,21 @@ import type { Plugin, Hooks } from "@opencode-ai/plugin"
 
 declare const Bun: any
 
+// Box-drawing characters
+const BOX = {
+  topLeft: "┌",
+  topRight: "┐",
+  bottomLeft: "└",
+  bottomRight: "┘",
+  horizontal: "─",
+  vertical: "│",
+  topTee: "┬",
+  bottomTee: "┴",
+  leftTee: "├",
+  rightTee: "┤",
+  cross: "┼",
+}
+
 // Width cache for performance optimization
 const widthCache = new Map<string, number>()
 let cacheOperationCount = 0
@@ -87,6 +102,16 @@ function isValidTable(lines: string[]): boolean {
   return hasSeparator
 }
 
+function buildHorizontalLine(
+  colWidths: number[],
+  left: string,
+  mid: string,
+  right: string,
+): string {
+  const segments = colWidths.map((w) => BOX.horizontal.repeat(w + 2))
+  return left + segments.join(mid) + right
+}
+
 function formatTable(lines: string[]): string[] {
   const separatorIndices = new Set<number>()
   for (let i = 0; i < lines.length; i++) {
@@ -122,20 +147,33 @@ function formatTable(lines: string[]): string[] {
     }
   }
 
-  return rows.map((row, rowIndex) => {
-    const cells: string[] = []
-    for (let col = 0; col < colCount; col++) {
-      const cell = row[col] ?? ""
-      const align = colAlignments[col]
+  // Build the box-drawing table
+  const result: string[] = []
 
-      if (separatorIndices.has(rowIndex)) {
-        cells.push(formatSeparatorCell(colWidths[col], align))
-      } else {
+  // Top border
+  result.push(buildHorizontalLine(colWidths, BOX.topLeft, BOX.topTee, BOX.topRight))
+
+  // Data rows (skip separator rows, replace them with box-drawing middle borders)
+  for (let rowIndex = 0; rowIndex < rows.length; rowIndex++) {
+    if (separatorIndices.has(rowIndex)) {
+      // Replace markdown separator with box-drawing middle border
+      result.push(buildHorizontalLine(colWidths, BOX.leftTee, BOX.cross, BOX.rightTee))
+    } else {
+      // Data row with box-drawing vertical borders
+      const cells: string[] = []
+      for (let col = 0; col < colCount; col++) {
+        const cell = rows[rowIndex][col] ?? ""
+        const align = colAlignments[col]
         cells.push(padCell(cell, colWidths[col], align))
       }
+      result.push(BOX.vertical + " " + cells.join(" " + BOX.vertical + " ") + " " + BOX.vertical)
     }
-    return "| " + cells.join(" | ") + " |"
-  })
+  }
+
+  // Bottom border
+  result.push(buildHorizontalLine(colWidths, BOX.bottomLeft, BOX.bottomTee, BOX.bottomRight))
+
+  return result
 }
 
 function getAlignment(delimiterCell: string): "left" | "center" | "right" {
@@ -208,12 +246,6 @@ function padCell(text: string, width: number, align: "left" | "center" | "right"
   } else {
     return text + " ".repeat(totalPadding)
   }
-}
-
-function formatSeparatorCell(width: number, align: "left" | "center" | "right"): string {
-  if (align === "center") return ":" + "-".repeat(Math.max(1, width - 2)) + ":"
-  if (align === "right") return "-".repeat(Math.max(1, width - 1)) + ":"
-  return "-".repeat(width)
 }
 
 function incrementOperationCount() {
