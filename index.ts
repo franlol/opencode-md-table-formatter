@@ -2,18 +2,120 @@ import type { Plugin, Hooks } from "@opencode-ai/plugin"
 
 declare const Bun: any
 
+type Alignment = "left" | "center" | "right"
+
+type ParsedTable = {
+  rows: string[][]
+  colWidths: number[]
+  colAlignments: Alignment[]
+  separatorIndices: Set<number>
+}
+
+type TableStyle = {
+  renderTable: (table: ParsedTable) => string[]
+}
+
+type TableStyleName = "markdown" | "boxDrawing" | "doublePipe"
+
+type BorderChars = {
+  topLeft: string; topRight: string; bottomLeft: string; bottomRight: string
+  horizontal: string; vertical: string
+  topTee: string; bottomTee: string; leftTee: string; rightTee: string; cross: string
+}
+
 // Width cache for performance optimization
 const widthCache = new Map<string, number>()
 let cacheOperationCount = 0
 
+function createBorderedStyle(chars: BorderChars): TableStyle {
+  function buildHorizontalLine(colWidths: number[], left: string, mid: string, right: string): string {
+    const segments = colWidths.map((w) => chars.horizontal.repeat(w + 2))
+    return left + segments.join(mid) + right
+  }
+
+  return {
+    renderTable(table: ParsedTable): string[] {
+      const { rows, colWidths, colAlignments, separatorIndices } = table
+      const colCount = colWidths.length
+      const result: string[] = []
+
+      result.push(buildHorizontalLine(colWidths, chars.topLeft, chars.topTee, chars.topRight))
+
+      for (let rowIndex = 0; rowIndex < rows.length; rowIndex++) {
+        if (separatorIndices.has(rowIndex)) {
+          result.push(buildHorizontalLine(colWidths, chars.leftTee, chars.cross, chars.rightTee))
+        } else {
+          const cells: string[] = []
+          for (let col = 0; col < colCount; col++) {
+            const cell = rows[rowIndex][col] ?? ""
+            cells.push(padCell(cell, colWidths[col], colAlignments[col]))
+          }
+          result.push(chars.vertical + " " + cells.join(" " + chars.vertical + " ") + " " + chars.vertical)
+        }
+      }
+
+      result.push(buildHorizontalLine(colWidths, chars.bottomLeft, chars.bottomTee, chars.bottomRight))
+      return result
+    },
+  }
+}
+
+function formatSeparatorCell(width: number, align: Alignment): string {
+  if (align === "center") return ":" + "-".repeat(Math.max(1, width - 2)) + ":"
+  if (align === "right") return "-".repeat(Math.max(1, width - 1)) + ":"
+  return "-".repeat(width)
+}
+
+const markdownStyle: TableStyle = {
+  renderTable(table: ParsedTable): string[] {
+    const { rows, colWidths, colAlignments, separatorIndices } = table
+    const colCount = colWidths.length
+
+    return rows.map((row, rowIndex) => {
+      const cells: string[] = []
+      for (let col = 0; col < colCount; col++) {
+        const cell = row[col] ?? ""
+        if (separatorIndices.has(rowIndex)) {
+          cells.push(formatSeparatorCell(colWidths[col], colAlignments[col]))
+        } else {
+          cells.push(padCell(cell, colWidths[col], colAlignments[col]))
+        }
+      }
+      return "| " + cells.join(" | ") + " |"
+    })
+  },
+}
+
+const TABLE_STYLES: Record<TableStyleName, TableStyle> = {
+  markdown: markdownStyle,
+  boxDrawing: createBorderedStyle({
+    topLeft: "┌", topRight: "┐", bottomLeft: "└", bottomRight: "┘",
+    horizontal: "─", vertical: "│",
+    topTee: "┬", bottomTee: "┴", leftTee: "├", rightTee: "┤", cross: "┼",
+  }),
+  doublePipe: createBorderedStyle({
+    topLeft: "╔", topRight: "╗", bottomLeft: "╚", bottomRight: "╝",
+    horizontal: "═", vertical: "║",
+    topTee: "╦", bottomTee: "╩", leftTee: "╠", rightTee: "╣", cross: "╬",
+  }),
+}
+
+function resolveStyleName(): TableStyleName {
+  const env = (typeof process !== "undefined" && process.env?.OPENCODE_TABLE_STYLE) || ""
+  if (env in TABLE_STYLES) return env as TableStyleName
+  return "markdown"
+}
+
 export const FormatTables: Plugin = async () => {
+  const style = TABLE_STYLES[resolveStyleName()]
+
   return {
     "experimental.text.complete": async (
       input: { sessionID: string; messageID: string; partID: string },
       output: { text: string },
     ) => {
       try {
-        output.text = formatMarkdownTables(output.text)
+        output.text = formatMarkdownTables(output.text, style)
       } catch (error) {
         // If formatting fails, keep original md text
         output.text = output.text + "\n\n<!-- table formatting failed: " + (error as Error).message + " -->"
@@ -22,7 +124,7 @@ export const FormatTables: Plugin = async () => {
   } as Hooks
 }
 
-function formatMarkdownTables(text: string): string {
+function formatMarkdownTables(text: string, style: TableStyle): string {
   const lines = text.split("\n")
   const result: string[] = []
   let i = 0
@@ -40,7 +142,7 @@ function formatMarkdownTables(text: string): string {
       }
 
       if (isValidTable(tableLines)) {
-        result.push(...formatTable(tableLines))
+        result.push(...formatTable(tableLines, style))
       } else {
         result.push(...tableLines)
         result.push("<!-- table not formatted: invalid structure -->")
@@ -87,7 +189,7 @@ function isValidTable(lines: string[]): boolean {
   return hasSeparator
 }
 
-function formatTable(lines: string[]): string[] {
+function parseTable(lines: string[]): ParsedTable {
   const separatorIndices = new Set<number>()
   for (let i = 0; i < lines.length; i++) {
     if (isSeparatorRow(lines[i])) separatorIndices.add(i)
@@ -100,11 +202,9 @@ function formatTable(lines: string[]): string[] {
       .map((cell) => cell.trim()),
   )
 
-  if (rows.length === 0) return lines
-
   const colCount = Math.max(...rows.map((row) => row.length))
 
-  const colAlignments: Array<"left" | "center" | "right"> = Array(colCount).fill("left")
+  const colAlignments: Alignment[] = Array(colCount).fill("left")
   for (const rowIndex of separatorIndices) {
     const row = rows[rowIndex]
     for (let col = 0; col < row.length; col++) {
@@ -122,23 +222,16 @@ function formatTable(lines: string[]): string[] {
     }
   }
 
-  return rows.map((row, rowIndex) => {
-    const cells: string[] = []
-    for (let col = 0; col < colCount; col++) {
-      const cell = row[col] ?? ""
-      const align = colAlignments[col]
-
-      if (separatorIndices.has(rowIndex)) {
-        cells.push(formatSeparatorCell(colWidths[col], align))
-      } else {
-        cells.push(padCell(cell, colWidths[col], align))
-      }
-    }
-    return "| " + cells.join(" | ") + " |"
-  })
+  return { rows, colWidths, colAlignments, separatorIndices }
 }
 
-function getAlignment(delimiterCell: string): "left" | "center" | "right" {
+function formatTable(lines: string[], style: TableStyle): string[] {
+  const table = parseTable(lines)
+  if (table.rows.length === 0) return lines
+  return style.renderTable(table)
+}
+
+function getAlignment(delimiterCell: string): Alignment {
   const trimmed = delimiterCell.trim()
   const hasLeftColon = trimmed.startsWith(":")
   const hasRightColon = trimmed.endsWith(":")
@@ -195,7 +288,7 @@ function getStringWidth(text: string): number {
   return Bun.stringWidth(visualText)
 }
 
-function padCell(text: string, width: number, align: "left" | "center" | "right"): string {
+function padCell(text: string, width: number, align: Alignment): string {
   const displayWidth = calculateDisplayWidth(text)
   const totalPadding = Math.max(0, width - displayWidth)
 
@@ -208,12 +301,6 @@ function padCell(text: string, width: number, align: "left" | "center" | "right"
   } else {
     return text + " ".repeat(totalPadding)
   }
-}
-
-function formatSeparatorCell(width: number, align: "left" | "center" | "right"): string {
-  if (align === "center") return ":" + "-".repeat(Math.max(1, width - 2)) + ":"
-  if (align === "right") return "-".repeat(Math.max(1, width - 1)) + ":"
-  return "-".repeat(width)
 }
 
 function incrementOperationCount() {

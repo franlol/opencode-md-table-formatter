@@ -33,6 +33,47 @@ Add the plugin to your `.opencode/opencode.jsonc`:
   </tr>
 </table>
 
+## Configuration
+
+Set the `OPENCODE_TABLE_STYLE` environment variable to choose a table style. If unset or invalid, defaults to `markdown`.
+
+| Value         | Description                                |
+|---------------|--------------------------------------------|
+| `markdown`    | Standard markdown tables (default)         |
+| `boxDrawing`  | Single-line box-drawing characters         |
+| `doublePipe`  | Double-line box-drawing characters         |
+
+**markdown** (default):
+
+```
+| Name   | Age | City     |
+| ------ | --- | -------- |
+| Alice  | 30  | New York |
+| Bob    | 25  | London   |
+```
+
+**boxDrawing**:
+
+```
+┌────────┬─────┬──────────┐
+│ Name   │ Age │ City     │
+├────────┼─────┼──────────┤
+│ Alice  │ 30  │ New York │
+│ Bob    │ 25  │ London   │
+└────────┴─────┴──────────┘
+```
+
+**doublePipe**:
+
+```
+╔════════╦═════╦══════════╗
+║ Name   ║ Age ║ City     ║
+╠════════╬═════╬══════════╣
+║ Alice  ║ 30  ║ New York ║
+║ Bob    ║ 25  ║ London   ║
+╚════════╩═════╩══════════╝
+```
+
 ## Features
 
 - **Automatic table formatting** - Formats markdown tables after AI text completion
