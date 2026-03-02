@@ -57,15 +57,20 @@ function formatMarkdownTables(text: string): string {
   return result.join("\n")
 }
 
+// Split on `|` but not on `\|` (escaped pipe is literal content, not a delimiter)
+function splitByUnescapedPipe(text: string): string[] {
+  return text.split(/(?<!\\)\|/)
+}
+
 function isTableRow(line: string): boolean {
   const trimmed = line.trim()
-  return trimmed.startsWith("|") && trimmed.endsWith("|") && trimmed.split("|").length > 2
+  return trimmed.startsWith("|") && trimmed.endsWith("|") && splitByUnescapedPipe(trimmed).length > 2
 }
 
 function isSeparatorRow(line: string): boolean {
   const trimmed = line.trim()
   if (!trimmed.startsWith("|") || !trimmed.endsWith("|")) return false
-  const cells = trimmed.split("|").slice(1, -1)
+  const cells = splitByUnescapedPipe(trimmed).slice(1, -1)
   return cells.length > 0 && cells.every((cell) => /^\s*:?-+:?\s*$/.test(cell))
 }
 
@@ -73,8 +78,7 @@ function isValidTable(lines: string[]): boolean {
   if (lines.length < 2) return false
 
   const rows = lines.map((line) =>
-    line
-      .split("|")
+    splitByUnescapedPipe(line)
       .slice(1, -1)
       .map((cell) => cell.trim()),
   )
@@ -96,8 +100,7 @@ function formatTable(lines: string[]): string[] {
   }
 
   const rows = lines.map((line) =>
-    line
-      .split("|")
+    splitByUnescapedPipe(line)
       .slice(1, -1)
       .map((cell) => cell.trim()),
   )
