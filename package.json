@@ -1,7 +1,7 @@
 {
   "name": "@franlol/opencode-md-table-formatter",
   "version": "2.0.0",
-  "description": "OpenCode 2 markdown table alignment via instruction injection (fork, ported from @franlol/opencode-md-table-formatter)",
+  "description": "Markdown table formatter plugin for OpenCode v2 \u2014 injects table-alignment instructions (v2 removed experimental.text.complete)",
   "keywords": [
     "opencode",
     "plugin",
@@ -10,13 +10,13 @@
     "formatter",
     "alignment"
   ],
-  "homepage": "https://github.com/webboty/opencode-md-table-formatter#readme",
+  "homepage": "https://github.com/franlol/opencode-md-table-formatter#readme",
   "bugs": {
-    "url": "https://github.com/webboty/opencode-md-table-formatter/issues"
+    "url": "https://github.com/franlol/opencode-md-table-formatter/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/webboty/opencode-md-table-formatter.git"
+    "url": "git+https://github.com/franlol/opencode-md-table-formatter.git"
   },
   "license": "MIT",
   "author": "franlol",

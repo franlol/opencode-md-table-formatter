@@ -1,4 +1,4 @@
-# opencode-md-table-formatter (webboty fork, OpenCode 2)
+# opencode-md-table-formatter — OpenCode 2 port
 
 > **OpenCode 2 port.** v1 post-processed completed text via `experimental.text.complete`,
 > which OpenCode v2 removed. There is no supported output-text rewrite in v2, so this fork
@@ -15,9 +15,6 @@ Add the plugin to your `opencode.jsonc`:
 }
 ```
 
-## Upstream
-
-Fork of [franlol/opencode-md-table-formatter](https://github.com/franlol/opencode-md-table-formatter) — original v1 implementation remains on the upstream repo.
 
 ## Usage
 
