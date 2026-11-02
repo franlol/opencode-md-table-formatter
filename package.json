@@ -1,29 +1,30 @@
 {
   "name": "@franlol/opencode-md-table-formatter",
-  "version": "0.0.6",
-  "description": "Markdown table formatter plugin for OpenCode with concealment mode support",
+  "version": "2.0.0",
+  "description": "OpenCode 2 markdown table alignment via instruction injection (fork, ported from @franlol/opencode-md-table-formatter)",
   "keywords": [
     "opencode",
     "plugin",
     "markdown",
     "table",
     "formatter",
-    "concealment",
-    "alignment",
-    "text-formatting"
+    "alignment"
   ],
-  "homepage": "https://github.com/franlol/opencode-md-table-formatter#readme",
+  "homepage": "https://github.com/webboty/opencode-md-table-formatter#readme",
   "bugs": {
-    "url": "https://github.com/franlol/opencode-md-table-formatter/issues"
+    "url": "https://github.com/webboty/opencode-md-table-formatter/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/franlol/opencode-md-table-formatter.git"
+    "url": "git+https://github.com/webboty/opencode-md-table-formatter.git"
   },
   "license": "MIT",
   "author": "franlol",
   "type": "module",
   "main": "index.ts",
+  "exports": {
+    ".": "./index.ts"
+  },
   "files": [
     "index.ts",
     "LICENSE",
@@ -33,7 +34,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "peerDependencies": {
-    "@opencode-ai/plugin": ">=0.13.7"
+    "@opencode/plugin": "^2.2.0"
   },
   "engines": {
     "node": ">=18.0.0"
