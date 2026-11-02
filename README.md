@@ -1,6 +1,20 @@
-# @franlol/opencode-md-table-formatter
+# opencode-md-table-formatter — OpenCode 2 port
 
-Markdown table formatter plugin for Opencode with concealment mode support.
+> **OpenCode 2 port.** v1 post-processed completed text via `experimental.text.complete`,
+> which OpenCode v2 removed. There is no supported output-text rewrite in v2, so this fork
+> injects an aligned-table formatting instruction into every model request via
+> `ctx.session.hook("context")` — the model emits aligned tables itself.
+
+## Usage
+
+Add the plugin to your `opencode.jsonc`:
+
+```jsonc
+{
+  "plugins": ["github:webboty/opencode-md-table-formatter"]
+}
+```
+
 
 ## Usage
 
