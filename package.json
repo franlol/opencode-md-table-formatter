@@ -1,16 +1,14 @@
 {
   "name": "@franlol/opencode-md-table-formatter",
-  "version": "0.0.6",
-  "description": "Markdown table formatter plugin for OpenCode with concealment mode support",
+  "version": "2.0.0",
+  "description": "OpenCode 2 plugin that asks the model to emit aligned markdown tables, with the original table formatter kept as a tested pure function",
   "keywords": [
     "opencode",
     "plugin",
     "markdown",
     "table",
     "formatter",
-    "concealment",
-    "alignment",
-    "text-formatting"
+    "alignment"
   ],
   "homepage": "https://github.com/franlol/opencode-md-table-formatter#readme",
   "bugs": {
@@ -24,16 +22,27 @@
   "author": "franlol",
   "type": "module",
   "main": "index.ts",
+  "exports": {
+    ".": "./index.ts"
+  },
   "files": [
     "index.ts",
+    "table-formatter.ts",
     "LICENSE",
     "README.md"
   ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "bun test",
+    "typecheck": "tsc --noEmit",
+    "verify": "bun test && tsc --noEmit"
   },
   "peerDependencies": {
-    "@opencode-ai/plugin": ">=0.13.7"
+    "@opencode/plugin": ">=2.0.0"
+  },
+  "devDependencies": {
+    "@opencode/plugin": "2.0.30",
+    "@types/bun": "latest",
+    "typescript": "^5.9.3"
   },
   "engines": {
     "node": ">=18.0.0"
