@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2026-11-03
+
+### Changed
+
+- Ported to the OpenCode 2 plugin API: the package default-exports
+  `Plugin.define({ id: "md-table-formatter", setup })` and registers a session
+  `context` hook.
+- Alignment moved from output-post-processing to a request-side instruction,
+  because OpenCode 2 removed `experimental.text.complete` and has no supported
+  output-text rewrite. This is a prompt-level nudge, not a formatter.
+- `peerDependencies` now target `@opencode/plugin` (OpenCode 2) instead of
+  `@opencode-ai/plugin`.
+
+### Added
+
+- `formatMarkdownTables` is kept as an exported pure function in
+  `table-formatter.ts`, with unit tests for alignment markers, escaped pipes,
+  and wide (CJK) characters.
+- Escaped pipes (`\|`) are no longer treated as column delimiters.
+
+### Removed
+
+- The `experimental.text.complete` hook and the V1 `FormatTables` export, both
+  of which OpenCode 2 no longer supports.
+
 ## [0.1.0] - 2025-01-07
 
 ### Added
